@@ -1,22 +1,14 @@
 <template>
-  <div class="home">
-
-  </div>
+  <div class="home"></div>
 </template>
 
 <script>
-
 export default {
   name: "Home",
-  data(){
-    return{}
+  data() {
+    return {};
   },
-  methods:{
-
-  },
-  computed:{
-    
-  }
-  
+  methods: {},
+  computed: {}
 };
 </script>

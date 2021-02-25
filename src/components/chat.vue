@@ -57,7 +57,8 @@
           </v-card-text>
         </v-card>
       </v-menu>
-      {{ to.userType == 0 ? to.nombre : `Sala ${to.nombre}` }}<v-spacer></v-spacer>
+      {{ to.userType == 0 ? to.nombre : `Sala ${to.nombre}`
+      }}<v-spacer></v-spacer>
       <v-btn fab dark small color="error" @click="$emit('cerrar')"
         ><v-icon>mdi-close</v-icon></v-btn
       ></v-card-title
@@ -65,7 +66,9 @@
     <v-divider></v-divider>
     <v-card-text>
       <div
-        :style="`height:${cardTextHeight}px;overflow-y:auto;scroll-top:${cardTextHeight}px;`"
+        :style="
+          `height:${cardTextHeight}px;overflow-y:auto;scroll-top:${cardTextHeight}px;`
+        "
         id="chatWindow"
       >
         <div>
@@ -95,7 +98,7 @@
               userType: 0,
               user: $store.state.user.id,
               text: msg,
-              to: to.id,
+              to: to.id
             });
             msg = '';
             $forceUpdate;
@@ -173,7 +176,7 @@ import ChatBubble from "./chat_bubble.vue";
 export default {
   components: { VEmojiPicker, ChatBubble },
   props: {
-    to: Object,
+    to: Object
   },
   data() {
     return {
@@ -189,46 +192,50 @@ export default {
           Nature: "Natureza",
           Peoples: "Pessoas",
           Symbols: "Símbolos",
-          Places: "Locais",
-        },
+          Places: "Locais"
+        }
       },
       cardHeight: "100%",
       cardTextHeight: "",
       scrollHeight: 0,
       files: [],
-      fileUploadLoading: false,
+      fileUploadLoading: false
     };
   },
   watch: {
-    to() {
-      this.msg = "";
-    },
+    to: {
+      deep:true,
+      handler(newVal,old){
+        console.log(old.id,newVal)
+        this.msg=""
+      }
+    }
   },
   methods: {
-    removeFile: function (file) {
+    removeFile: function(file) {
       let mv = this;
       let options = {
         method: "post",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           token: mv.$store.state.user.token,
-          link: file.link,
-        }),
+          link: file.link
+        })
       };
       fetch(`${mv.$store.state.server}/deleteFile`, options)
-        .then((res) => {
+        .then(res => {
           return res.json();
         })
-        .then((json) => {
+        .then(json => {
           if (json.deleted) {
-            let idx = mv.files.findIndex((f) => {
+            let idx = mv.files.findIndex(f => {
               return f.link == json.link;
             });
             mv.files.splice(idx, 1);
           }
         });
     },
-    uploadFile: function (e) {
+    uploadFile: function(e) {
       let mv = this;
       mv.fileUploadLoading = true;
       if (e.target.files) {
@@ -237,17 +244,17 @@ export default {
         formData.append("token", mv.$store.state.user.token);
         let options = {
           method: "post",
-          body: formData,
+          body: formData
         };
         fetch(`${mv.$store.state.server}/uploadFile`, options)
-          .then((res) => {
+          .then(res => {
             return res.json();
           })
-          .then((json) => {
+          .then(json => {
             if (json.link) {
               mv.files.push(json);
               document.getElementById("inputFile").value = "";
-              mv.$refs.textChat.focus()
+              mv.$refs.textChat.focus();
             }
           });
         mv.fileUploadLoading = false;
@@ -256,71 +263,77 @@ export default {
     insertarEmoji(emoji) {
       this.msg += emoji.data;
     },
-    send: function (e) {
+    send: function(e) {
       let mv = this;
       if (e.ctrlKey) {
         mv.msg += "\n";
         e.pre;
       } else {
-        if(mv.msg.toString().trim().length==0 && mv.files.length==0){return;}
-        let data ={
-              to: mv.to.id,
-              from: mv.$store.state.user.id,
-              texto: mv.msg,
-              files: JSON.stringify(mv.files),
-              userType: mv.to.userType,
-            }
+        if (mv.msg.toString().trim().length == 0 && mv.files.length == 0) {
+          return;
+        }
+        let data = {
+          to: mv.to.id,
+          from: mv.$store.state.user.id,
+          texto: mv.msg,
+          files: JSON.stringify(mv.files),
+          userType: mv.to.userType
+        };
         let options = {
           method: "post",
           headers: {
-            "content-type": "application/json",
+            "content-type": "application/json"
           },
           body: JSON.stringify({
             token: mv.$store.state.user.token,
-            data: data,
-          }),
-        };
-        fetch(`${mv.$store.state.server}/mensaje`, options)
-          .then((res) => {
-            return res.json;
+            data: data
           })
-          
+        };
+        //console.log(data)
+        fetch(`${mv.$store.state.server}/mensaje`, options).then(res => {
+          return res.json;
+        });
+
         mv.msg = "";
-        mv.files=[]
+        mv.files = [];
         mv.$forceUpdate;
       }
     },
-    updateScroll: function () {
+    updateScroll: function() {
       let chatWindow = document.getElementById("chatWindow");
-      chatWindow.scrollTop = chatWindow.scrollHeight;
-    },
+      if(chatWindow){
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+      }
+      
+    }
   },
   computed: {
-    msgs: function () {
+    msgs: function() {
       let mv = this;
-      return mv.$store.state.mensajes.filter((m) => {
-        if(mv.to.userType == 0){
-          return (m.to == mv.to.id && m.from==mv.$store.state.user.id) || (m.from==mv.to.id && m.to==mv.$store.state.user.id);
-        }else{
-          return m.to==mv.to.id && m.userType==mv.to.userType
+      return mv.$store.state.mensajes.filter(m => {
+        if (mv.to.userType == 0) {
+          return (
+            (m.to == mv.to.id && m.from == mv.$store.state.user.id) ||
+            (m.from == mv.to.id && m.to == mv.$store.state.user.id)
+          );
+        } else {
+          return m.to == mv.to.id && m.userType == mv.to.userType;
         }
-        
       });
-    },
+    }
   },
-  updated: function () {
+  updated: function() {
     this.updateScroll();
   },
-  mounted: function () {
+  mounted: function() {
     let mv = this;
     mv.cardTextHeight = window.innerHeight - 272;
     window.onresize = () => {
       mv.cardTextHeight = window.innerHeight - 272;
       mv.updateScroll();
     };
-  },
+  }
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -12,10 +12,13 @@ connection.on("error", () => {
 });
 
 const list = (data, handler) => {
-  if(!data.campos){data.campos="*"}
+  if (!data.campos) {
+    data.campos = "*";
+  }
   let sql = `select ${data.campos} from ${data.tabla} ${
     data.condición ? "where " + data.condición : ""
   }`;
+  data.tabla=="salas"?console.log(sql):()=>{}
   connection.query(sql, (err, rows) => {
     if (err) {
       handler(err);
@@ -27,16 +30,15 @@ const list = (data, handler) => {
 
 const save = (data, handler) => {
   let sql = ``;
-  if (data.data.id > 0) {
+  if ( data.data.id > 0 || data.condición ) {
     let updateParams = [];
-    Object.keys(data.data).forEach((key) => {
+    Object.keys(data.data).forEach(key => {
       if (key != "id") {
         updateParams.push(`\`${key}\`='${data.data[key]}'`);
       }
     });
-    sql = `update ${data.tabla} set ${updateParams.join(",")} where id = '${
-      data.data.id
-    }';`;
+    sql = `update ${data.tabla} set ${updateParams.join(",")} where ${data.data.id>0?'id = \''+
+      data.data.id+'\'':data.condición};`;
   } else {
     delete data.data.id;
     let keys = `\`${Object.keys(data.data).join("`,`")}\``;
@@ -51,6 +53,7 @@ const save = (data, handler) => {
     }
   });
 };
+
 
 const remove = (data, handler) => {
   let sql = `delete from ${data.tabla} where ${data.condición};`;

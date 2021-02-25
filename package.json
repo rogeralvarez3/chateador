@@ -2,12 +2,22 @@
   "name": "chatx",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "Róger Alvarez",
+    "email": "roger.alvarez@coopefacsa.coop"
+  },
+  "description": "programa de chat oficial para coopefacsa rl",
   "scripts": {
     "serve": "vue-cli-service serve --target electron-renderer",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
+    "electron:build": "vue-cli-service electron:build",
+    "electron:serve": "vue-cli-service electron:serve",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps",
     "api": "nodemon server.js"
   },
+  "main": "background.js",
   "dependencies": {
     "core-js": "^3.6.5",
     "v-emoji-picker": "^2.3.3",
@@ -26,6 +36,7 @@
     "babel-eslint": "^10.1.0",
     "cors": "^2.8.5",
     "electron": "^11.2.3",
+    "electron-devtools-installer": "^3.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-prettier": "^3.1.3",
     "eslint-plugin-vue": "^6.2.2",
@@ -38,6 +49,7 @@
     "sass": "^1.32.0",
     "sass-loader": "^10.0.0",
     "socket.io": "^3.1.1",
+    "vue-cli-plugin-electron-builder": "~2.0.0-rc.6",
     "vue-cli-plugin-vuetify": "~2.1.0",
     "vue-template-compiler": "^2.6.11",
     "vuetify-loader": "^1.7.0"
